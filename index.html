@@ -115,7 +115,7 @@ scanBtn.addEventListener("click",async()=>{
      scanned++;
      try{
        const file=await item.handle.getFile();
-       const key=baseName(item.name);
+       const key=baseName(item.name)+"\u0000"+ext(item.name);
        if(!groups.has(key))groups.set(key,[]);
        groups.get(key).push({...item,size:file.size});
      }catch(e){errors++}
@@ -127,7 +127,7 @@ scanBtn.addEventListener("click",async()=>{
      const originals=files.filter(f=>!isCopy(f.name));
      if(copies.length&&(originals.length||copies.length>1)){
        groupCount++;
-       for(const item of copies){results.push({...item,group:key,id:results.length});totalBytes+=item.size}
+       for(const item of copies){results.push({...item,group:baseName(item.name),id:results.length});totalBytes+=item.size}
      }
    }
    results.sort((a,b)=>a.group.localeCompare(b.group)||a.name.localeCompare(b.name,undefined,{numeric:true}));
@@ -172,8 +172,7 @@ async function deleteItems(indexes){
 deleteSelectedBtn.addEventListener("click",()=>deleteItems([...selected]));
 deleteAllBtn.addEventListener("click",()=>{
  if(!results.length)return;
- const ok=window.confirm("DELETE ALL "+results.length+" LISTED DUPLICATE COPIES?\n\nThis permanently deletes every listed numbered copy. Original files without a numbered suffix are not included.\n\nThis cannot be undone. Continue?");
- if(ok)deleteItems(results.map((_,i)=>i));
+ deleteItems(results.map((_,i)=>i));
 });
 </script>
 </body>
